@@ -1,0 +1,543 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css"> 
+    <!-- <meta name='viewport' content='user-scalable=0'> -->
+    <style>
+        body, html{
+            width: 100vw;
+            height: 100vh;
+            overflow-x:hidden;
+            overflow-y:hidden;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            background-image: radial-gradient(circle at top right, rgba(121, 68, 154, 0.13),       transparent),
+            radial-gradient(circle at 20% 80%, rgba(41, 196, 255, 0.13), transparent);
+        }
+
+        #canvas1{
+            width: auto;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: visible;
+        }
+
+        #canvas2 {
+            width: auto;
+            height: 100vh;
+            z-index: 98;
+            pointer-events: none;
+        }
+
+        #name, #description{
+            position: absolute;
+            pointer-events: none;
+            z-index:9;
+        }
+
+        #name{
+            font-size:900%;
+            width:90%;
+            top: 10vh;
+            left: 5vw;
+            /* margin: 5vh 0 0 3%; */
+            color:rgb(255, 227, 152);
+            transition:1s;
+        }
+
+        #description{
+            font-size:40%;
+            color:rgb(214, 214, 214);
+        }
+        #project{
+            font-size:40%;
+            top: 10%;
+            color:rgb(214, 214, 214);
+        }
+
+
+        canvas {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        .key{
+            position: absolute;
+            transition: 0.4s;
+            border: 0;
+        }
+
+        .white:hover{
+            opacity:0.4;
+            transition: 0.1s;
+        }
+
+        .white:hover ~ .black{
+            background-color: rgba(0, 0, 0, 1);
+            transition: 0s;
+        }
+
+        .black:hover{
+            transition: 0.1s;
+            border: solid 2px rgba(124, 255, 244, 0.726)
+        }
+
+        .key:active{
+            opacity:0.8;
+            transition: 0.1s;
+            border-bottom: white 5px solid;
+        }
+        .black:active{
+            opacity:0.9;
+            background-color: rgb(156, 156, 156);
+        }
+        .white{
+            background-color: rgb(204, 204, 204);
+            z-index:1;
+            height: 100vh;
+            width: 12.1vw;
+            opacity: 0.01;
+        }
+
+        .black{
+            /* background-color: rgba(0, 0, 0, 1); */
+            background-color: rgba(0, 0, 0, 0.74);
+            z-index:2;
+            height: 56vh;
+            /* height: 66vh; */
+            /* top: -10vh; */
+            width: 9.01vw;
+            border-radius: 10px;
+            border: solid 1px rgba(41, 255, 237, 0.15)
+        }
+    </style>
+  </head>
+     
+    <canvas id="canvas1"></canvas>
+    <canvas id="canvas2"></canvas>
+
+    <body>
+      
+      <div id="name">Bryan Leong
+        <div id="description"></div>
+      </div>
+
+      
+      <div class='key white c' style='left:0%'></div>
+      <div class='key white d' style='left:12.5%'></div>
+      <div class='key white e' style='left:25%'></div>
+      <div class='key white f' style='left:37.5%'></div>
+      <div class='key white g' style='left:50%'></div>
+      <div class='key white a' style='left:62.5%'></div>
+      <div class='key white b' style='left:75%'></div>
+      <div class='key white c2'style='left:87.5%'></div>
+
+      <div id="#blacky" class='key black c#' style='left:8%'></div>
+      <div class='key black d#' style='left:20.5%'></div>
+      <div class='key black f#' style='left:45.5%'></div>
+      <div class='key black g#' style='left:58%'></div>
+      <div class='key black a#' style='left:70.5%'></div>
+      <div class='key black c#' style='left:95.5%;'></div>
+      
+
+
+    </body>
+  
+    
+    <script src="script.js">
+    const STAR_COUNT = ( window.innerWidth + window.innerHeight ) / 8,
+        STAR_SIZE = 3,
+        STAR_MIN_SCALE = 0.2,
+        OVERFLOW_THRESHOLD = 50;
+
+    const canvas = document.getElementById( 'canvas1' ),
+        context = canvas.getContext( '2d' );
+
+    let scale = 1, // device pixel ratio
+        width,
+        height;
+
+    let stars = [];
+
+    let pointerX,
+        pointerY;
+
+    let velocity = { x: 0, y: 0, tx: 0, ty: 0, z: 0.0005 };
+
+    let touchInput = false;
+
+    generate();
+    resize();
+    step();
+
+    window.onresize = resize;
+    canvas.onmousemove = onMouseMove;
+    canvas.ontouchmove = onTouchMove;
+    canvas.ontouchend = onMouseLeave;
+    document.onmouseleave = onMouseLeave;
+
+    function generate() {
+
+    for( let i = 0; i < STAR_COUNT; i++ ) {
+        stars.push({
+        x: 0,
+        y: 0,
+        z: STAR_MIN_SCALE + Math.random() * ( 1 - STAR_MIN_SCALE )
+        });
+    }
+
+    }
+
+    function placeStar( star ) {
+
+    star.x = Math.random() * width;
+    star.y = Math.random() * height;
+
+    }
+
+    function recycleStar( star ) {
+
+    let direction = 'z';
+
+    let vx = Math.abs( velocity.x ),
+            vy = Math.abs( velocity.y );
+
+    if( vx > 1 || vy > 1 ) {
+        let axis;
+
+        if( vx > vy ) {
+        axis = Math.random() < vx / ( vx + vy ) ? 'h' : 'v';
+        }
+        else {
+        axis = Math.random() < vy / ( vx + vy ) ? 'v' : 'h';
+        }
+
+        if( axis === 'h' ) {
+        direction = velocity.x > 0 ? 'l' : 'r';
+        }
+        else {
+        direction = velocity.y > 0 ? 't' : 'b';
+        }
+    }
+    
+    star.z = STAR_MIN_SCALE + Math.random() * ( 1 - STAR_MIN_SCALE );
+
+    if( direction === 'z' ) {
+        star.z = 0.1;
+        star.x = Math.random() * width;
+        star.y = Math.random() * height;
+    }
+    else if( direction === 'l' ) {
+        star.x = -OVERFLOW_THRESHOLD;
+        star.y = height * Math.random();
+    }
+    else if( direction === 'r' ) {
+        star.x = width + OVERFLOW_THRESHOLD;
+        star.y = height * Math.random();
+    }
+    else if( direction === 't' ) {
+        star.x = width * Math.random();
+        star.y = -OVERFLOW_THRESHOLD;
+    }
+    else if( direction === 'b' ) {
+        star.x = width * Math.random();
+        star.y = height + OVERFLOW_THRESHOLD;
+    }
+
+    }
+
+    function resize() {
+
+    scale = window.devicePixelRatio || 1;
+
+    width = window.innerWidth * scale;
+    height = window.innerHeight * scale;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    stars.forEach( placeStar );
+
+    }
+
+    function step() {
+
+    context.clearRect( 0, 0, width, height );
+
+    update();
+    render();
+
+    requestAnimationFrame( step );
+
+    }
+
+    function update() {
+
+    velocity.tx *= 0.96;
+    velocity.ty *= 0.96;
+
+    velocity.x += ( velocity.tx - velocity.x ) * 0.8;
+    velocity.y += ( velocity.ty - velocity.y ) * 0.8;
+
+    stars.forEach( ( star ) => {
+
+        star.x += velocity.x * star.z;
+        star.y += velocity.y * star.z;
+
+        star.x += ( star.x - width/2 ) * velocity.z * star.z;
+        star.y += ( star.y - height/2 ) * velocity.z * star.z;
+        star.z += velocity.z;
+    
+        // recycle when out of bounds
+        if( star.x < -OVERFLOW_THRESHOLD || star.x > width + OVERFLOW_THRESHOLD || star.y < -OVERFLOW_THRESHOLD || star.y > height + OVERFLOW_THRESHOLD ) {
+        recycleStar( star );
+        }
+
+    } );
+
+    }
+
+    function render() {
+
+    stars.forEach( ( star ) => {
+
+        context.beginPath();
+        context.lineCap = 'round';
+        context.lineWidth = STAR_SIZE * star.z * scale;
+        context.strokeStyle = 'rgba(255,255,255,'+(0.5 + 0.5*Math.random())+')';
+
+        context.beginPath();
+        context.moveTo( star.x, star.y );
+
+        var tailX = velocity.x * 2,
+            tailY = velocity.y * 2;
+
+        // stroke() wont work on an invisible line
+        if( Math.abs( tailX ) < 0.1 ) tailX = 0.5;
+        if( Math.abs( tailY ) < 0.1 ) tailY = 0.5;
+
+        context.lineTo( star.x + tailX, star.y + tailY );
+
+        context.stroke();
+
+    } );
+
+    }
+
+    function movePointer( x, y ) {
+
+    if( typeof pointerX === 'number' && typeof pointerY === 'number' ) {
+
+        let ox = x - pointerX,
+            oy = y - pointerY;
+
+        velocity.tx = velocity.tx + ( ox / 7*scale ) * ( touchInput ? 1 : -1 );
+        velocity.ty = velocity.ty + ( oy / 7*scale ) * ( touchInput ? 1 : -1 );
+
+    }
+
+    pointerX = x;
+    pointerY = y;
+
+    }
+
+    function onMouseMove( event ) {
+
+    touchInput = false;
+
+    movePointer( event.clientX, event.clientY );
+
+    }
+
+    function onTouchMove( event ) {
+
+    touchInput = true;
+
+    movePointer( event.touches[0].clientX, event.touches[0].clientY, true );
+
+    event.preventDefault();
+
+    }
+
+    function onMouseLeave() {
+
+    pointerX = null;
+    pointerY = null;
+
+    }
+
+    ///////////////// Text Typing ///////////////
+
+    var i = 0;
+    var txt = 'Software Developer, Musician, Sociologist';
+    var speed = 50;
+
+    function typeWriter() {
+    if (i < txt.length) {
+        document.getElementById("description").innerHTML += txt.charAt(i);
+        i++;
+        setTimeout(typeWriter, speed);
+    }
+    }
+    typeWriter()
+
+
+    ///////////////// Button Click //////////////
+    var particles = [];
+    var alreadyRendering = false;
+
+    // originally from Rachel Smith on CodePen https://codepen.io/rachsmith/pen/oXBOwg
+    /* global particles */
+    function sparkShower(startx, starty, sparkWidth, sparkHeight) {
+    var canvas = document.getElementById('canvas2');
+    var ctx = canvas.getContext('2d');
+    var width = canvas.width = sparkWidth;
+    var height = canvas.height = sparkHeight;
+    //   var colors = ['#AF4A0D', '##FFD064', '#FEFFFD'];
+    var colors = ['#f0feff', '#ffffff', '#f0fff5'];
+    // this is only used for simple gravity
+    var gravity = 0.01;
+    //var particles = [];
+    var floor = sparkHeight;
+    var currentlySparking = false;
+    //   var maxSize = 10; //original
+    var maxSize = 5;
+    // This is the acceleration of Gravity in m/s.
+    var ag = 1.1;
+
+    function initParticles() {
+        currentlySparking = true;
+        for (var i = 0; i < 50; i++) {
+        setTimeout(function() {
+            createParticle(i);
+            createParticle(i * 2);
+        }, i);
+        }
+    }
+
+    function createParticle(i) {
+        // initial position in middle of canvas
+        var x = startx;
+        var y = starty;
+        var z = (Math.random() * 2);
+        // randomize the vx and vy a little - but we still want them flying 'up' and 'out'
+        var maxex = Math.random() * 10;
+        var vx = (Math.random() * maxex) - (maxex / 2);
+        var vy = (Math.random() * -20);
+        // velocity size?
+        var vsize = 0;
+        // randomize size and opacity a little & pick a color from our color palette
+        var size = 1 + Math.random();
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        var opacity = 0.5 + Math.random() * 0.5;
+        var d = new Date();
+        var startTime = d.getTime();
+        var p = new Particle(x, y, z, vx, vy, size, vsize, color, opacity, startTime, startTime);
+        p.finished = false;
+        particles.push(p);
+    }
+
+    function Particle(x, y, z, vx, vy, size, vsize, color, opacity, startTime, lastTime) {
+
+        function reset() {
+        opacity = 0;
+        this.finished = true;
+        }
+
+        this.update = function() {
+        // if a particle has faded to nothing we can reset it to the starting position
+        if (opacity - 0.0005 > 0) opacity -= 0.0005;
+        else reset();
+        // simple gravity
+        //vy += gravity;
+        var d = new Date();
+        var timeNow = d.getTime();
+        // Calculate gravity based on time elapsed since last update in lastTime
+        // Pixels per "Meter" = 4735 = 4.7
+        // Velocity of Y = Acceleration of Gravity in meters per second * number of seconds since last calc * pixels-per-meter
+        if (timeNow > lastTime)
+            // vy += (ag * ((timeNow - lastTime) / 1000) * 4.7);
+            vy += (ag * ((timeNow - lastTime) / 1000) * 0.7);
+        lastTime = timeNow;
+        x += vx;
+        y += vy;
+        if (y > (floor + 10)) this.finished = true;
+        if (size < maxSize) size += vsize * z;
+        if ((opacity < 0.5) && (y < floor)) {
+            vsize = 0.55 - opacity;
+        } else {
+            vsize = 0;
+        }
+        // add bouncing off the floor
+        if (y > floor) {
+            vy = vy * -0.4;
+            vx = vx * 0.96;
+        }
+        };
+
+        this.draw = function() {
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = color;
+        //ctx.fillRect(x, y, size, size);
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, 2 * Math.PI);
+        ctx.fill();
+        };
+    }
+
+    function render() {
+        alreadyRendering = true;
+        ctx.clearRect(0, 0, width, height);
+        for (var i = 0; i < particles.length; i++) {
+        if (typeof particles[i] !== "undefined") {
+            if (particles[i].finished === true) {
+            particles.splice(i, 1);
+            } else {
+            particles[i].update();
+            particles[i].draw();
+            }
+        }
+        }
+        requestAnimationFrame(render);
+    }
+
+    // resize
+    window.addEventListener('resize', resize);
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    // init
+    initParticles();
+    if (!alreadyRendering)
+        render();
+    }
+
+        function keyPress(thisKey) {
+
+        thisKeyRect = thisKey.getBoundingClientRect();
+        var initialX = thisKeyRect.left + ((thisKeyRect.right - thisKeyRect.left) / 2);
+        //   var initialY = thisKeyRect.bottom + (thisKeyRect.top - thisKeyRect.bottom / 2);
+        var initialY = thisKeyRect.bottom
+        console.log(initialX, initialY)
+        var sparkCanvas = $('#canvas2');
+        var sparkWidth = sparkCanvas.width();
+        var sparkHeight = sparkCanvas.height();
+        console.log(sparkWidth, sparkHeight)
+        //var sparkHeight = $('.video-stream').position().top;
+        sparkShower(initialX, initialY, sparkWidth, sparkHeight);
+        }
+
+        document.addEventListener('click', function(e) {
+            e = e || window.event;
+            var target = e.target;
+            keyPress(target);
+        })
+        
+    </script>
+    
+</html>
