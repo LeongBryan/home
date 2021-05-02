@@ -388,3 +388,122 @@ document.addEventListener('click', function(e) {
     var target = e.target;
 	keyPress(target);
 })
+
+
+///// Music /////
+let csound = document.getElementById('csound')
+let csharpsound = document.getElementById('csharpsound')
+let dsound = document.getElementById('dsound')
+let dsharpsound = document.getElementById('dsharpsound')
+let esound = document.getElementById('esound')
+let fsound = document.getElementById('fsound')
+let fsharpsound = document.getElementById('fsharpsound')
+let gsound = document.getElementById('gsound')
+let gsharpsound = document.getElementById('gsharpsound')
+let asound = document.getElementById('asound')
+let asharpsound = document.getElementById('asharpsound')
+let bsound = document.getElementById('bsound')
+let c2sound = document.getElementById('c2sound')
+let c2sharpsound = document.getElementById('c2sharpsound')
+
+let c = document.getElementById('c')
+let csharp = document.getElementById('csharp')
+let d = document.getElementById('d')
+let dsharp = document.getElementById('dsharp')
+let e = document.getElementById('e')
+let f = document.getElementById('f')
+let fsharp = document.getElementById('fsharp')
+let g = document.getElementById('g')
+let gsharp = document.getElementById('gsharp')
+let a = document.getElementById('a')
+let asharp = document.getElementById('asharp')
+let b = document.getElementById('b')
+let c2 = document.getElementById('c2')
+let c2sharp = document.getElementById('c2sharp')
+
+c.onclick =
+  function() {
+    console.log('C');
+    csound.play();
+    return false;
+    };
+
+csharp.onclick =
+  function() {
+    console.log('C#');
+    csharpsound.play();
+    return false;
+    };
+d.onclick =
+  function() {
+    console.log('D');
+    dsound.play();
+    return false;
+    };    
+dsharp.onclick =
+  function() {
+    console.log('D#');
+    dsharpsound.play();
+    return false;
+    };
+e.onclick =
+  function() {
+    console.log('E');
+    esound.play();
+    return false;
+    };
+f.onclick =
+  function() {
+    console.log('F');
+    fsound.play();
+    return false;
+    };
+fsharp.onclick =
+  function() {
+    console.log('F#');
+    fsharpsound.play();
+    return false;
+    };
+g.onclick =
+  function() {
+    console.log('G');
+    gsound.play();
+    return false;
+    };
+gsharp.onclick =
+  function() {
+    console.log('G#');
+    gsharpsound.play();
+    return false;
+    };
+a.onclick =
+  function() {
+    console.log('A');
+    asound.play();
+    return false;
+    };
+asharp.onclick =
+  function() {
+    console.log('A#');
+    asharpsound.play();
+    return false;
+    };
+b.onclick =
+  function() {
+    console.log('B');
+    bsound.play();
+    return false;
+    };
+c2.onclick =
+  function() {
+    console.log('C2');
+    c2sound.play();
+    return false;
+    };
+c2sharp.onclick =
+  function() {
+    console.log('C2');
+    c2sharpsound.play();
+    return false;
+    };
+

@@ -2,12 +2,25 @@
   <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="style.css"> 
-    <meta name='viewport' 
-     content='user-scalable=0' >
+    <meta name='viewport' content='user-scalable=0' >
   </head>
      
     <canvas id="canvas1"></canvas>
     <canvas id="canvas2"></canvas>
+    <audio id="csound" src="notes/C.mp3"></audio>
+    <audio id="csharpsound" src="notes/Csharp.mp3"></audio>
+    <audio id="dsound" src="notes/D.mp3"></audio>
+    <audio id="dsharpsound" src="notes/Dsharp.mp3"></audio>
+    <audio id="esound" src="notes/E.mp3"></audio>
+    <audio id="fsound" src="notes/F.mp3"></audio>
+    <audio id="fsharpsound" src="notes/Fsharp.mp3"></audio>
+    <audio id="gsound" src="notes/G.mp3"></audio>
+    <audio id="gsharpsound" src="notes/Gsharp.mp3"></audio>
+    <audio id="asound" src="notes/A.mp3"></audio>
+    <audio id="asharpsound" src="notes/Asharp.mp3"></audio>
+    <audio id="bsound" src="notes/B.mp3"></audio>
+    <audio id="c2sound" src="notes/C2.mp3"></audio>
+    <audio id="c2sharpsound" src="notes/C2sharp.mp3"></audio>
 
     <body>
       
@@ -16,21 +29,21 @@
       </div>
 
       
-      <div class='key white c' style='left:0%'></div>
-      <div class='key white d' style='left:12.5%'></div>
-      <div class='key white e' style='left:25%'></div>
-      <div class='key white f' style='left:37.5%'></div>
-      <div class='key white g' style='left:50%'></div>
-      <div class='key white a' style='left:62.5%'></div>
-      <div class='key white b' style='left:75%'></div>
-      <div class='key white c2'style='left:87.5%'></div>
+      <div id='c' class='key white' style='left:0%'></div>
+      <div id='d' class='key white' style='left:12.5%'></div>
+      <div id='e' class='key white' style='left:25%'></div>
+      <div id='f' class='key white' style='left:37.5%'></div>
+      <div id='g' class='key white' style='left:50%'></div>
+      <div id='a' class='key white' style='left:62.5%'></div>
+      <div id='b' class='key white' style='left:75%'></div>
+      <div id='c2' class='key white'style='left:87.5%'></div>
 
-      <div id="#blacky" class='key black c#' style='left:8%'></div>
-      <div class='key black d#' style='left:20.5%'></div>
-      <div class='key black f#' style='left:45.5%'></div>
-      <div class='key black g#' style='left:58%'></div>
-      <div class='key black a#' style='left:70.5%'></div>
-      <div class='key black c#' style='left:95.5%;'></div>
+      <div id='csharp' class='key black' style='left:8%'></div>
+      <div id='dsharp' class='key black' style='left:20.5%'></div>
+      <div id='fsharp' class='key black' style='left:45.5%'></div>
+      <div id='gsharp' class='key black' style='left:58%'></div>
+      <div id='asharp' class='key black' style='left:70.5%'></div>
+      <div id='c2sharp' class='key black' style='left:95.5%;'></div>
       
 
 
