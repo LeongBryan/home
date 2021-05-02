@@ -14,7 +14,8 @@ body, html{
 	width: auto;
 	height: 100vh;
 	z-index: 1;
-	pointer-events: visible;
+	pointer-events: visible; /* to get rid of moving background */
+	/* pointer-events: none; */
 }
 
 #canvas2 {
@@ -28,6 +29,7 @@ body, html{
 	position: absolute;
 	pointer-events: none;
 	z-index:9;
+	font-family: 'Roboto', sans-serif;
 }
 
 #name{
@@ -36,13 +38,13 @@ body, html{
 	top: 10vh;
 	left: 5vw;
 	/* margin: 5vh 0 0 3%; */
-	color:rgb(255, 227, 152);
+	color:rgb(238, 238, 238);
 	transition:1s;
 }
 
 #description{
 	font-size:40%;
-	color:rgb(214, 214, 214);
+	color:rgb(211, 211, 211);
 }
 #project{
 	font-size:40%;
@@ -61,10 +63,11 @@ canvas {
 	position: absolute;
 	transition: 0.4s;
 	border: 0;
+	overflow: hidden; /*to prevent ripple from escaping*/
 }
 
 .white:hover{
-	opacity:0.4;
+	background-color: rgba(204, 204, 204, 0.03);
 	transition: 0.1s;
 }
 
@@ -78,21 +81,11 @@ canvas {
 	border: solid 2px rgba(124, 255, 244, 0.726)
 }
 
-.key:active{
-	opacity:0.8;
-	transition: 0.1s;
-	border-bottom: white 5px solid;
-}
-.black:active{
-	opacity:0.9;
-	background-color: rgb(156, 156, 156);
-}
 .white{
-	background-color: rgb(204, 204, 204);
+	background-color: rgba(204, 204, 204, 0.01);
 	z-index:1;
 	height: 100vh;
 	width: 12.1vw;
-	opacity: 0.01;
 }
 
 .black{
@@ -107,6 +100,31 @@ canvas {
 	border: solid 1px rgba(41, 255, 237, 0.15)
 }
 
+/* it's either this or the ripple */
+.key:active{
+	background-color: rgba(204, 204, 204, 0);
+	opacity:0.8;
+	transition: 0.1s;
+	border-bottom: white 5px solid;
+}
+/* .black:active{
+	opacity:0.9;
+	background-color: rgb(156, 156, 156);
+} */
 
+span.ripple {
+	position: absolute; /* The absolute position we mentioned earlier */
+	border-radius: 50%;
+	transform: scale(0);
+	animation: ripple 800ms linear;
+	background-color: rgba(138, 250, 241, 0.829);
+}
+
+@keyframes ripple {
+	to {
+	  transform: scale(3);
+	  opacity: 0;
+	}
+}
 
 

@@ -241,6 +241,7 @@ var alreadyRendering = false;
 
 // originally from Rachel Smith on CodePen https://codepen.io/rachsmith/pen/oXBOwg
 /* global particles */
+
 function sparkShower(startx, starty, sparkWidth, sparkHeight) {
   var canvas = document.getElementById('canvas2');
   var ctx = canvas.getContext('2d');
@@ -254,7 +255,7 @@ function sparkShower(startx, starty, sparkWidth, sparkHeight) {
   var floor = sparkHeight;
   var currentlySparking = false;
 //   var maxSize = 10; //original
-  var maxSize = 5;
+  var maxSize = 3;
   // This is the acceleration of Gravity in m/s.
   var ag = 1.1;
 
@@ -272,17 +273,22 @@ function sparkShower(startx, starty, sparkWidth, sparkHeight) {
     // initial position in middle of canvas
     var x = startx;
     var y = starty;
+    // var z = (Math.random() * 2);
     var z = (Math.random() * 2);
     // randomize the vx and vy a little - but we still want them flying 'up' and 'out'
-    var maxex = Math.random() * 10;
+    // var maxex = Math.random() * 10;
+    // Starting speed?
+    var maxex = Math.random() * 5;
     var vx = (Math.random() * maxex) - (maxex / 2);
     var vy = (Math.random() * -20);
     // velocity size?
     var vsize = 0;
     // randomize size and opacity a little & pick a color from our color palette
-    var size = 1 + Math.random();
+    // var size = 1 + Math.random();
+    var size = 0.1
     var color = colors[Math.floor(Math.random() * colors.length)];
-    var opacity = 0.5 + Math.random() * 0.5;
+    // var opacity = 0.5 + Math.random() * 0.5;
+    var opacity = 0.3 + Math.random() * 0.3;
     var d = new Date();
     var startTime = d.getTime();
     var p = new Particle(x, y, z, vx, vy, size, vsize, color, opacity, startTime, startTime);
@@ -299,7 +305,8 @@ function sparkShower(startx, starty, sparkWidth, sparkHeight) {
 
     this.update = function() {
       // if a particle has faded to nothing we can reset it to the starting position
-      if (opacity - 0.0005 > 0) opacity -= 0.0005;
+      // SURVIVABILITY
+      if (opacity - 0.0005 > 0) opacity -= 0.0008;
       else reset();
       // simple gravity
       //vy += gravity;
@@ -383,11 +390,51 @@ function keyPress(thisKey) {
   sparkShower(initialX, initialY, sparkWidth, sparkHeight);
 }
 
+// This is what assigns the buttons
 document.addEventListener('click', function(e) {
     e = e || window.event;
     var target = e.target;
 	keyPress(target);
 })
+
+
+
+///// Pulses /////
+function createRipple(event) {
+  const key = event.currentTarget;
+  const theRipple = document.createElement("span");
+  const diameter = Math.max(key.clientWidth, key.clientHeight);
+  const radius = diameter / 2;
+  theRipple.style.width = theRipple.style.height = `${diameter}px`;
+  theRipple.style.left = `${event.clientX - (key.offsetLeft + radius)}px`;
+  theRipple.style.top = `${event.clientY - (key.offsetTop + radius)}px`;
+  /*
+  const key_width = key.clientWidth;
+  const key_height = key.clientHeight;
+  theRipple.style.width = `${key_width}px`;
+  theRipple.style.width = `${key_height}px`;
+  theRipple.style.left = `${event.clientX - (key.offsetLeft )}px`;
+  theRipple.style.top = `${event.clientY - (key.offsetTop )}px`;
+  */
+  theRipple.classList.add("ripple"); 
+  console.log('added ripple!')
+
+  // Check for existing and remove
+  const ripple = key.getElementsByClassName("ripple")[0];
+  if (ripple) {
+    console.log('Removing already existent ripple')
+    ripple.remove();
+  }
+
+  // Inject the span into key
+  key.appendChild(theRipple);
+}
+
+// This is what assigns the ripples
+const allKeys = document.getElementsByClassName('key')
+for (const key of allKeys) {
+  key.addEventListener("click", createRipple);
+}
 
 
 ///// Music /////
