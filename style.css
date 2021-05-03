@@ -67,8 +67,9 @@ canvas {
 }
 
 .white:hover{
-	background-color: rgba(204, 204, 204, 0.03);
+	background-color: rgba(204, 204, 204, 0.055);
 	transition: 0.1s;
+	border: solid 2px rgba(124, 255, 244, 0.726);
 }
 
 .white:hover ~ .black{
