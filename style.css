@@ -33,7 +33,7 @@ body, html{
 }
 
 #name{
-	font-size:900%;
+	font-size:850%;
 	width:90%;
 	top: 10vh;
 	left: 5vw;
@@ -43,7 +43,7 @@ body, html{
 }
 
 #description{
-	font-size:40%;
+	font-size:37%;
 	color:rgb(211, 211, 211);
 }
 #project{
