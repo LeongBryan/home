@@ -391,11 +391,11 @@ function keyPress(thisKey) {
 }
 
 // This is what assigns the buttons
-document.addEventListener('click', function(e) {
-    e = e || window.event;
-    var target = e.target;
-	keyPress(target);
-})
+// document.addEventListener('click', function(e) {
+//     e = e || window.event;
+//     var target = e.target;
+// 	keyPress(target);
+// })
 
 
 
