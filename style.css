@@ -29,7 +29,9 @@ body, html{
 	position: absolute;
 	pointer-events: none;
 	z-index:9;
-	font-family: 'Roboto', sans-serif;
+	/* font-family: 'Roboto', sans-serif; */
+	font-family: 'Luckiest Guy', cursive;
+	/* font-family: 'Press Start 2P', cursive; */
 }
 
 #name{
