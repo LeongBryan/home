@@ -248,16 +248,16 @@ function sparkShower(startx, starty, sparkWidth, sparkHeight) {
   var width = canvas.width = sparkWidth;
   var height = canvas.height = sparkHeight;
 //   var colors = ['#AF4A0D', '##FFD064', '#FEFFFD'];
-  var colors = ['#f0feff', '#ffffff', '#f0fff5'];
+  var colors = ['#ff96d0', '#ffffff', '#ebdde9'];
   // this is only used for simple gravity
-  var gravity = 0.01;
+  var gravity = 1;
   //var particles = [];
   var floor = sparkHeight;
   var currentlySparking = false;
 //   var maxSize = 10; //original
   var maxSize = 3;
   // This is the acceleration of Gravity in m/s.
-  var ag = 1.1;
+  var ag = 4.1;
 
   function initParticles() {
     currentlySparking = true;
@@ -391,11 +391,11 @@ function keyPress(thisKey) {
 }
 
 // This is what assigns the buttons
-// document.addEventListener('click', function(e) {
-//     e = e || window.event;
-//     var target = e.target;
-// 	keyPress(target);
-// })
+document.addEventListener('click', function(e) {
+    e = e || window.event;
+    var target = e.target;
+	keyPress(target);
+})
 
 
 
@@ -554,3 +554,60 @@ c2sharp.onclick =
     return false;
     };
 
+///// projects page down /////
+
+var keys_visible = true
+
+function toggleProjects() {
+  var btn = document.getElementById("projects-btn");
+  var arrowIcon = document.getElementById("arrow-icon");
+  var allProjects = document.getElementById("allProjects")
+  var toolTipText = document.getElementById("tooltiptext")
+  const allKeys = document.getElementsByClassName('key');
+
+  if (keys_visible == true) {
+    toolTipText.innerHTML = 'Click me to play piano!' //dodgy logic
+    arrowIcon.classList.remove('fa-chevron-circle-down');
+    arrowIcon.classList.add('fa-chevron-circle-up');
+    
+
+    keys_visible = false
+
+    for (const key of allKeys) {      
+      key.classList.remove("keys_in");
+      key.classList.remove("keys_out");
+      void key.offsetTop;
+      key.classList.add("keys_out");
+    }
+    allProjects.classList.remove("projects_out");
+    allProjects.classList.remove("projects_in");
+    void allProjects.offsetTop;
+    allProjects.classList.add("projects_in");
+
+
+
+  } else { 
+    toolTipText.innerHTML = 'Click me for more projects!' //dodgy logic
+    arrowIcon.classList.remove('fa-chevron-circle-up');
+    arrowIcon.classList.add('fa-chevron-circle-down');
+
+    keys_visible = true;
+
+    for (const key of allKeys) {
+      key.classList.remove("keys_out");
+      key.classList.remove("keys_in");
+      void key.offsetTop;
+      key.classList.add("keys_in"); 
+    }
+
+    allProjects.classList.remove("projects_in");
+    allProjects.classList.remove("projects_out");
+    void allProjects.offsetTop;
+    allProjects.classList.add("projects_out");
+
+
+  }
+  btn.className
+
+
+}

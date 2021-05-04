@@ -35,9 +35,9 @@ body, html{
 }
 
 #name{
-	font-size:850%;
+	font-size:650%;
 	width:90%;
-	top: 10vh;
+	top: 8vh;
 	left: 5vw;
 	/* margin: 5vh 0 0 3%; */
 	color:rgb(238, 238, 238);
@@ -45,15 +45,109 @@ body, html{
 }
 
 #description{
-	font-size:37%;
+	font-size:30%;
 	color:rgb(211, 211, 211);
 }
-#project{
-	font-size:40%;
-	top: 10%;
-	color:rgb(214, 214, 214);
+
+  
+@keyframes shake {
+	0% { transform: translate(1px, 1px) rotate(0deg); }
+	10% { transform: translate(-1px, -2px) rotate(-1deg); }
+	20% { transform: translate(-3px, 0px) rotate(1deg); }
+	30% { transform: translate(3px, 2px) rotate(0deg); }
+	40% { transform: translate(1px, -1px) rotate(1deg); }
+	50% { transform: translate(-1px, 2px) rotate(-1deg); }
+	60% { transform: translate(-3px, 1px) rotate(0deg); }
+	70% { transform: translate(3px, 1px) rotate(-1deg); }
+	80% { transform: translate(-1px, -1px) rotate(1deg); }
+	90% { transform: translate(1px, 2px) rotate(0deg); }
+	100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
+
+  
+/* Tooltip text */
+#tooltiptext {
+	font-size:40%;
+	visibility: hidden;
+	background-color: rgb(255, 255, 255);
+	color: rgb(0, 0, 0);
+	text-align: center;
+	border-radius: 6px;
+	width: 200px;
+	bottom: 130%;
+	left: 50%;
+	margin-left: -100px; /* Use half of the width (120/2 = 60), to center the tooltip */
+   
+	/* Position the tooltip text - see examples below! */
+	position: absolute;
+	z-index: 1;
+}
+  
+  /* Show the tooltip text when you mouse over the tooltip container */
+#projects-btn:hover #tooltiptext {
+	visibility: visible;
+	transition: 0.6s;
+}
+
+#projects-div{
+	position: absolute;
+	z-index:9;
+}
+
+#projects-btn{
+	display:inline-block;
+	font-size:70%;
+	pointer-events: auto;
+	font-family: 'Luckiest Guy', cursive;
+	color:rgb(255, 255, 255);
+	background-color: rgba(121, 68, 154, 0);
+	border:none;
+}
+
+#projects-btn:hover{
+	cursor:pointer;
+	color:rgba(138, 250, 241, 0.829);
+
+	/* Start the shake animation and make the animation last for 0.5 seconds */
+	animation: shake 0.5s;
+  
+	/* When the animation is finished, start again */
+	animation-iteration-count: infinite;
+}
+
+#projects-btn:active{
+	color:rgba(255, 255, 255, 0.829);
+}
+
+.project-link{
+	font-size:90%;
+	position: relative;
+	pointer-events: auto;
+	font-family: 'Luckiest Guy', cursive;
+	color:rgba(34, 192, 255, 0.822);
+	text-decoration: none;
+}
+
+.project-link:hover{
+	text-decoration: underline;
+	color:rgb(60, 195, 248);
+	font-size:94%;
+}
+
+#allProjects{
+	display:flex;
+	flex-direction: column;
+	position: relative;
+	font-size:250%;
+	margin-top: 26.5vh;
+	top: -100%;
+	left: 5vw;
+	z-index: 9;
+}
+.flex-child{
+	margin-top: 1.6%;
+}
 
 canvas {
 	position: fixed;
@@ -66,6 +160,7 @@ canvas {
 	transition: 0.4s;
 	border: 0;
 	overflow: hidden; /*to prevent ripple from escaping*/
+	top:0%; /*to prevent project stuff from pushing it down*/
 }
 
 .white:hover{
@@ -96,6 +191,7 @@ canvas {
 	background-color: rgba(0, 0, 0, 0.74);
 	z-index:2;
 	height: 56vh;
+	/* height: 56vh; */
 	/* height: 66vh; */
 	/* top: -10vh; */
 	width: 9.01vw;
@@ -129,5 +225,50 @@ span.ripple {
 	  opacity: 0;
 	}
 }
+
+.keys_out{
+	transition:1s;
+	animation: keys_animate_out 1s forwards;
+}
+
+@keyframes keys_animate_out {
+	0% { top:0%; opacity:1 }
+	70% {opacity:0}
+	100% { top:100%; opacity:0}
+}
+
+.keys_in{
+	transition:1s;
+	animation: keys_animate_in 1s forwards;
+}
+
+@keyframes keys_animate_in {
+	0% { top:100%; opacity:0 }
+	70% {opacity:1}
+	100% { top:0%; opacity:1}
+}
+
+.projects_out{
+	transition:1s;
+	animation: projects_animate_out 1s forwards;
+}
+
+@keyframes projects_animate_out {
+	0% { top:0%; opacity:1 }
+	70% {opacity:0}
+	100% { top:-100%; opacity:0}
+}
+
+.projects_in{
+	transition:1s;
+	animation: projects_animate_in 1s forwards;
+}
+
+@keyframes projects_animate_in {
+	0% { top:-100%; opacity:0 }
+	70% {opacity:1}
+	100% { top:0%; opacity:1}
+}
+
 
 

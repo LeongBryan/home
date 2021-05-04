@@ -6,6 +6,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <script src="https://use.fontawesome.com/6699a8eea0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.js" integrity="sha256-2JRzNxMJiS0aHOJjG+liqsEOuBb6++9cY4dSOyiijX4=" crossorigin="anonymous"></script>
+
+
     <meta property="og:title" content="Bryan Leong Homepage">
     <meta property="og:description" content="Assorted projects and a fun little music app">
     <meta property="og:image" content="https://github.com/LeongBryan/home/blob/master/cover_photo.jpg">
@@ -15,10 +20,12 @@
     <meta prefix="og: http://ogp.me/ns#" property="og:type" content="website" />
     <meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://github.com/LeongBryan/home/blob/master/cover_photo.jpg" />
     <meta prefix="og: http://ogp.me/ns#" property="og:url" content="https://leongbryan.github.io/home/" />
+    
   </head>
      
     <canvas id="canvas1"></canvas>
     <canvas id="canvas2"></canvas>
+
     <audio id="csound" src="notes/C.mp3"></audio>
     <audio id="csharpsound" src="notes/Csharp.mp3"></audio>
     <audio id="dsound" src="notes/D.mp3"></audio>
@@ -36,8 +43,19 @@
 
     <body>
       
-      <div id="name">Bryan Leong
+      <div id="name">Bryan Leong   <button class="keys_are_shown" onclick="toggleProjects()" id="projects-btn"> <i id="arrow-icon" class="fas fa-chevron-circle-down"></i><span id='tooltiptext'>Click me for more projects!</span></button>
         <div id="description"></div>
+      </div>
+
+      <!-- Use any of the w3-animate-classes to fade, zoom or slide in the dropdown content (w3-animate-zoom|opacity|top|bottom|left|right) -->
+      
+      <div id="allProjects" class="">
+        <div class="flex-child"><a href="https://www.kongregate.com/games/bleongmusic/inky" class="project-link">> Inky - Game hosted on Kongregate</a></div>
+        <div class="flex-child"><a href="https://leongbryan.github.io/Mossie-Wipeout/" class="project-link">> Mossie Wipeout - Endless clicker browser game</a></div>
+        <div class="flex-child"><a href="https://github.com/LeongBryan/weddingwebsite" class="project-link">> Wedding Website - DIY-ed for my wedding</a></div>
+        <div class="flex-child"><a href="https://soundcloud.com/bleongmusic" class="project-link">> Soundcloud - Some electronic originals</a></div>
+        <div class="flex-child"><a href="https://www.facebook.com/bleongmusic/" class="project-link">> BleongMusic - Facebook page of some musical endeavours</a></div>
+        <div class="flex-child"><a href="https://github.com/LeongBryan" class="project-link">> Other code projects at github...</a></div>
       </div>
 
       
