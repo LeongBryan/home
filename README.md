@@ -12,4 +12,4 @@ Ripple on click: [Bret Cameron](https://css-tricks.com/author/) <br>
 Accessible here: https://leongbryan.github.io/home/
 
 It looks something like this:
-
+![alt text](https://github.com/LeongBryan/home/blob/master/github_home.gif)
