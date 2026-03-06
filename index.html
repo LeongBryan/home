@@ -1,85 +1,146 @@
-<html>
+﻿<!doctype html>
+<html lang="en">
   <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="style.css"> 
-    <meta name='viewport' content='user-scalable=0' >
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Press+Start+2P&display=swap" rel="stylesheet">
-    
-    <script src="https://use.fontawesome.com/6699a8eea0.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.js" integrity="sha256-2JRzNxMJiS0aHOJjG+liqsEOuBb6++9cY4dSOyiijX4=" crossorigin="anonymous"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bryan Leong | Interactive Keyboard</title>
+    <meta
+      name="description"
+      content="Interactive piano-style homepage with project links and visual effects."
+    />
 
+    <meta property="og:title" content="Bryan Leong Homepage" />
+    <meta
+      property="og:description"
+      content="Assorted projects and a fun little music app"
+    />
+    <meta
+      property="og:image"
+      content="https://raw.githubusercontent.com/LeongBryan/home/master/cover_photo.jpg"
+    />
+    <meta property="og:url" content="https://leongbryan.github.io/home/" />
+    <meta property="og:type" content="website" />
 
-    <meta property="og:title" content="Bryan Leong Homepage">
-    <meta property="og:description" content="Assorted projects and a fun little music app">
-    <meta property="og:image" content="https://github.com/LeongBryan/home/blob/master/cover_photo.jpg">
-    <meta property="og:url" content="https://leongbryan.github.io/home/">
-    
-    <meta prefix="og: http://ogp.me/ns#" property="og:title" content="Bryan Leong Homepagep" />
-    <meta prefix="og: http://ogp.me/ns#" property="og:type" content="website" />
-    <meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://github.com/LeongBryan/home/blob/master/cover_photo.jpg" />
-    <meta prefix="og: http://ogp.me/ns#" property="og:url" content="https://leongbryan.github.io/home/" />
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bungee&family=Manrope:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
   </head>
-     
-    <canvas id="canvas1"></canvas>
-    <canvas id="canvas2"></canvas>
+  <body>
+    <canvas id="stars-canvas" aria-hidden="true"></canvas>
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+    <div class="bg-glow" aria-hidden="true"></div>
 
-    <audio id="csound" src="notes/C.mp3"></audio>
-    <audio id="csharpsound" src="notes/Csharp.mp3"></audio>
-    <audio id="dsound" src="notes/D.mp3"></audio>
-    <audio id="dsharpsound" src="notes/Dsharp.mp3"></audio>
-    <audio id="esound" src="notes/E.mp3"></audio>
-    <audio id="fsound" src="notes/F.mp3"></audio>
-    <audio id="fsharpsound" src="notes/Fsharp.mp3"></audio>
-    <audio id="gsound" src="notes/G.mp3"></audio>
-    <audio id="gsharpsound" src="notes/Gsharp.mp3"></audio>
-    <audio id="asound" src="notes/A.mp3"></audio>
-    <audio id="asharpsound" src="notes/Asharp.mp3"></audio>
-    <audio id="bsound" src="notes/B.mp3"></audio>
-    <audio id="c2sound" src="notes/C2.mp3"></audio>
-    <audio id="c2sharpsound" src="notes/C2sharp.mp3"></audio>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">DevOps Engineer - Musician - Sociologist</p>
+        <h1 class="title">Bryan Leong</h1>
+        <p class="subtitle">
+          A playful portfolio from the self-learning era. Tap keys, make noise, and
+          browse the side projects.
+        </p>
 
-    <body>
-      
-      <div id="name">Bryan Leong   <button class="keys_are_shown" onclick="toggleProjects()" id="projects-btn"> <i id="arrow-icon" class="fas fa-chevron-circle-down"></i><span id='tooltiptext'>Click me for more projects!</span></button>
-        <div id="description"></div>
-      </div>
+        <div class="actions">
+          <button
+            id="projects-toggle"
+            class="projects-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="projects-list"
+          >
+            Show Projects
+          </button>
+          <span class="hint">Tip: use Z-M and S/J/L keys to play notes.</span>
+        </div>
 
-      <!-- Use any of the w3-animate-classes to fade, zoom or slide in the dropdown content (w3-animate-zoom|opacity|top|bottom|left|right) -->
-      
-      <div id="allProjects" class="">
-        <div class="flex-child"><a href="https://www.kongregate.com/games/bleongmusic/inky" class="project-link">> Inky - Game hosted on Kongregate</a></div>
-        <div class="flex-child"><a href="https://leongbryan.github.io/Mossie-Wipeout/" class="project-link">> Mossie Wipeout - Endless clicker browser game</a></div>
-        <div class="flex-child"><a href="https://github.com/LeongBryan/weddingwebsite" class="project-link">> Wedding Website - DIY-ed for my wedding</a></div>
-        <div class="flex-child"><a href="https://soundcloud.com/bleongmusic" class="project-link">> Soundcloud - Some electronic originals</a></div>
-        <div class="flex-child"><a href="https://www.facebook.com/bleongmusic/" class="project-link">> BleongMusic - Facebook page of some musical endeavours</a></div>
-        <div class="flex-child"><a href="https://github.com/LeongBryan" class="project-link">> Other code projects at github...</a></div>
-      </div>
+        <ul id="projects-list" class="projects-list" hidden>
+          <li>
+            <a href="https://github.com/LeongBryan/" target="_blank" rel="noreferrer noopener"
+              >GitHub Profile - LeongBryan</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/LeongBryan/bible-quizarium" target="_blank" rel="noreferrer noopener"
+              >Bible Quizarium - Project Repo</a
+            >
+          </li>
+          <li>
+            <a href="https://hymnops.xyz" target="_blank" rel="noreferrer noopener"
+              >HymnOps - Live at hymnops.xyz</a
+            >
+            (<a href="https://github.com/LeongBryan/HymnOps" target="_blank" rel="noreferrer noopener"
+              >repo</a
+            >)
+          </li>
+          <li>
+            <a href="https://www.kongregate.com/games/bleongmusic/inky" target="_blank" rel="noreferrer noopener"
+              >Inky - Game hosted on Kongregate</a
+            >
+          </li>
+          <li>
+            <a href="https://leongbryan.github.io/Mossie-Wipeout/" target="_blank" rel="noreferrer noopener"
+              >Mossie Wipeout - Endless clicker browser game</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/LeongBryan/weddingwebsite" target="_blank" rel="noreferrer noopener"
+              >Wedding Website - DIY build</a
+            >
+          </li>
+          <li>
+            <a href="https://soundcloud.com/bleongmusic" target="_blank" rel="noreferrer noopener"
+              >SoundCloud - Electronic originals</a
+            >
+          </li>
+          <li>
+            <a href="https://www.facebook.com/bleongmusic/" target="_blank" rel="noreferrer noopener"
+              >BleongMusic - Music page</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/LeongBryan/" target="_blank" rel="noreferrer noopener"
+              >More code projects on GitHub</a
+            >
+          </li>
+        </ul>
+      </section>
+    </main>
 
-      
-      <div id='c' class='key white' style='left:0%'></div>
-      <div id='d' class='key white' style='left:12.5%'></div>
-      <div id='e' class='key white' style='left:25%'></div>
-      <div id='f' class='key white' style='left:37.5%'></div>
-      <div id='g' class='key white' style='left:50%'></div>
-      <div id='a' class='key white' style='left:62.5%'></div>
-      <div id='b' class='key white' style='left:75%'></div>
-      <div id='c2' class='key white'style='left:87.5%'></div>
+    <section id="keyboard" class="keyboard" aria-label="Interactive keyboard">
+      <audio data-note="c" src="notes/C.mp3" preload="auto"></audio>
+      <audio data-note="csharp" src="notes/Csharp.mp3" preload="auto"></audio>
+      <audio data-note="d" src="notes/D.mp3" preload="auto"></audio>
+      <audio data-note="dsharp" src="notes/Dsharp.mp3" preload="auto"></audio>
+      <audio data-note="e" src="notes/E.mp3" preload="auto"></audio>
+      <audio data-note="f" src="notes/F.mp3" preload="auto"></audio>
+      <audio data-note="fsharp" src="notes/Fsharp.mp3" preload="auto"></audio>
+      <audio data-note="g" src="notes/G.mp3" preload="auto"></audio>
+      <audio data-note="gsharp" src="notes/Gsharp.mp3" preload="auto"></audio>
+      <audio data-note="a" src="notes/A.mp3" preload="auto"></audio>
+      <audio data-note="asharp" src="notes/Asharp.mp3" preload="auto"></audio>
+      <audio data-note="b" src="notes/B.mp3" preload="auto"></audio>
+      <audio data-note="c2" src="notes/C2.mp3" preload="auto"></audio>
+      <audio data-note="c2sharp" src="notes/C2sharp.mp3" preload="auto"></audio>
 
-      <div id='csharp' class='key black' style='left:8%'></div>
-      <div id='dsharp' class='key black' style='left:20.5%'></div>
-      <div id='fsharp' class='key black' style='left:45.5%'></div>
-      <div id='gsharp' class='key black' style='left:58%'></div>
-      <div id='asharp' class='key black' style='left:70.5%'></div>
-      <div id='c2sharp' class='key black' style='left:95.5%;'></div>
-      
+      <button class="key white" data-note="c" aria-label="C" style="--left: 0%"></button>
+      <button class="key white" data-note="d" aria-label="D" style="--left: 12.5%"></button>
+      <button class="key white" data-note="e" aria-label="E" style="--left: 25%"></button>
+      <button class="key white" data-note="f" aria-label="F" style="--left: 37.5%"></button>
+      <button class="key white" data-note="g" aria-label="G" style="--left: 50%"></button>
+      <button class="key white" data-note="a" aria-label="A" style="--left: 62.5%"></button>
+      <button class="key white" data-note="b" aria-label="B" style="--left: 75%"></button>
+      <button class="key white" data-note="c2" aria-label="C2" style="--left: 87.5%"></button>
 
-
-    </body>
-  
-    
-    <script src="script.js"></script>
-    
+      <button class="key black" data-note="csharp" aria-label="C sharp" style="--left: 8%"></button>
+      <button class="key black" data-note="dsharp" aria-label="D sharp" style="--left: 20.5%"></button>
+      <button class="key black" data-note="fsharp" aria-label="F sharp" style="--left: 45.5%"></button>
+      <button class="key black" data-note="gsharp" aria-label="G sharp" style="--left: 58%"></button>
+      <button class="key black" data-note="asharp" aria-label="A sharp" style="--left: 70.5%"></button>
+      <button class="key black" data-note="c2sharp" aria-label="C2 sharp" style="--left: 95.5%"></button>
+    </section>
+  </body>
 </html>
