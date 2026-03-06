@@ -1,613 +1,316 @@
-const STAR_COUNT = ( window.innerWidth + window.innerHeight ) / 8,
-      STAR_SIZE = 3,
-      STAR_MIN_SCALE = 0.2,
-      OVERFLOW_THRESHOLD = 50;
+(() => {
+  "use strict";
 
-const canvas = document.getElementById( 'canvas1' ),
-      context = canvas.getContext( '2d' );
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-let scale = 1, // device pixel ratio
-    width,
-    height;
+  const starsCanvas = document.getElementById("stars-canvas");
+  const starsCtx = starsCanvas.getContext("2d", { alpha: true });
+  const fxCanvas = document.getElementById("fx-canvas");
+  const fxCtx = fxCanvas.getContext("2d", { alpha: true });
 
-let stars = [];
+  const keyboardEl = document.getElementById("keyboard");
+  const keyElements = Array.from(keyboardEl.querySelectorAll(".key"));
+  const keyByNote = new Map(keyElements.map((key) => [key.dataset.note, key]));
+  const audioByNote = new Map(
+    Array.from(document.querySelectorAll("audio[data-note]")).map((audio) => [audio.dataset.note, audio])
+  );
 
-let pointerX,
-    pointerY;
+  const keyboardLayout = {
+    z: "c",
+    s: "csharp",
+    x: "d",
+    d: "dsharp",
+    c: "e",
+    v: "f",
+    g: "fsharp",
+    b: "g",
+    h: "gsharp",
+    n: "a",
+    j: "asharp",
+    m: "b",
+    ",": "c2",
+    l: "c2sharp"
+  };
 
-let velocity = { x: 0, y: 0, tx: 0, ty: 0, z: 0.0005 };
+  const projectsToggle = document.getElementById("projects-toggle");
+  const projectsList = document.getElementById("projects-list");
+  let projectsOpen = false;
 
-let touchInput = false;
+  let dpr = 1;
+  let width = 0;
+  let height = 0;
+  let starCount = 0;
+  let starX = new Float32Array(0);
+  let starY = new Float32Array(0);
+  let starZ = new Float32Array(0);
+  let starAlpha = new Float32Array(0);
+  let driftX = 0;
+  let driftY = 0;
+  let targetX = 0;
+  let targetY = 0;
+  let starAnimationId = 0;
 
-generate();
-resize();
-step();
+  const particles = [];
+  let particleAnimationId = 0;
+  let lastParticleTime = 0;
 
-window.onresize = resize;
-// canvas.onmousemove = onMouseMove;
-// canvas.ontouchmove = onTouchMove;
-// canvas.ontouchend = onMouseLeave;  
-// document.onmouseleave = onMouseLeave;
+  function resizeCanvas(canvas, context) {
+    const targetWidth = Math.floor(window.innerWidth * dpr);
+    const targetHeight = Math.floor(window.innerHeight * dpr);
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
 
-function generate() {
+  function resetStar(index) {
+    starX[index] = (Math.random() - 0.5) * width;
+    starY[index] = (Math.random() - 0.5) * height;
+    starZ[index] = 0.1 + Math.random() * 0.9;
+    starAlpha[index] = 0.25 + Math.random() * 0.55;
+  }
 
-   for( let i = 0; i < STAR_COUNT; i++ ) {
-    stars.push({
-      x: 0,
-      y: 0,
-      z: STAR_MIN_SCALE + Math.random() * ( 1 - STAR_MIN_SCALE )
+  function setupStars() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    resizeCanvas(starsCanvas, starsCtx);
+    resizeCanvas(fxCanvas, fxCtx);
+
+    starCount = Math.max(90, Math.min(260, Math.floor((width * height) / 9000)));
+    starX = new Float32Array(starCount);
+    starY = new Float32Array(starCount);
+    starZ = new Float32Array(starCount);
+    starAlpha = new Float32Array(starCount);
+
+    for (let i = 0; i < starCount; i += 1) {
+      resetStar(i);
+    }
+
+    drawStarFrame(16);
+  }
+
+  function drawStarFrame(dt) {
+    starsCtx.clearRect(0, 0, width, height);
+
+    driftX += (targetX - driftX) * 0.055;
+    driftY += (targetY - driftY) * 0.055;
+
+    const zoomStep = (prefersReducedMotion ? 0.002 : 0.01) * (dt / 16);
+
+    for (let i = 0; i < starCount; i += 1) {
+      starZ[i] -= zoomStep;
+      if (starZ[i] <= 0.06) {
+        resetStar(i);
+      }
+
+      const invZ = 1 / starZ[i];
+      const screenX = starX[i] * invZ + width * 0.5 + driftX * 28;
+      const screenY = starY[i] * invZ + height * 0.5 + driftY * 28;
+
+      if (screenX < -60 || screenX > width + 60 || screenY < -60 || screenY > height + 60) {
+        resetStar(i);
+        continue;
+      }
+
+      const tail = 0.7 + invZ * 0.7;
+      const opacity = Math.min(0.92, starAlpha[i] + invZ * 0.12);
+      starsCtx.strokeStyle = `rgba(183, 235, 255, ${opacity.toFixed(3)})`;
+      starsCtx.lineWidth = Math.min(2.2, 0.4 + invZ * 0.5);
+      starsCtx.beginPath();
+      starsCtx.moveTo(screenX, screenY);
+      starsCtx.lineTo(screenX - driftX * tail - 0.14, screenY - driftY * tail - 0.14);
+      starsCtx.stroke();
+    }
+  }
+
+  function animateStars(timestamp) {
+    if (!animateStars.last) {
+      animateStars.last = timestamp;
+    }
+    const dt = Math.min(34, timestamp - animateStars.last);
+    animateStars.last = timestamp;
+
+    drawStarFrame(dt);
+    starAnimationId = window.requestAnimationFrame(animateStars);
+  }
+
+  function sparkPalette() {
+    return ["#ffe9b4", "#9ef5dc", "#6cd3ff"];
+  }
+
+  function spawnSparks(x, y) {
+    const colors = sparkPalette();
+    const count = prefersReducedMotion ? 12 : 28;
+
+    for (let i = 0; i < count; i += 1) {
+      particles.push({
+        x,
+        y,
+        vx: (Math.random() - 0.5) * (prefersReducedMotion ? 3 : 5),
+        vy: -Math.random() * (prefersReducedMotion ? 3.5 : 6.5) - 1,
+        life: 0.7 + Math.random() * 0.35,
+        size: 1.4 + Math.random() * 2,
+        color: colors[(Math.random() * colors.length) | 0]
+      });
+    }
+
+    if (!particleAnimationId) {
+      lastParticleTime = performance.now();
+      particleAnimationId = window.requestAnimationFrame(animateParticles);
+    }
+  }
+
+  function animateParticles(timestamp) {
+    const dt = Math.min(34, timestamp - lastParticleTime);
+    const factor = dt / 16;
+    lastParticleTime = timestamp;
+
+    fxCtx.clearRect(0, 0, width, height);
+
+    for (let i = particles.length - 1; i >= 0; i -= 1) {
+      const p = particles[i];
+      p.life -= 0.026 * factor;
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+
+      p.vy += 0.18 * factor;
+      p.vx *= 0.995;
+      p.x += p.vx * factor;
+      p.y += p.vy * factor;
+
+      fxCtx.globalAlpha = Math.max(0, p.life);
+      fxCtx.fillStyle = p.color;
+      fxCtx.beginPath();
+      fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      fxCtx.fill();
+    }
+
+    fxCtx.globalAlpha = 1;
+
+    if (particles.length > 0) {
+      particleAnimationId = window.requestAnimationFrame(animateParticles);
+    } else {
+      particleAnimationId = 0;
+      fxCtx.clearRect(0, 0, width, height);
+    }
+  }
+
+  function flashKey(key) {
+    key.classList.add("is-active");
+    clearTimeout(key.flashTimer);
+    key.flashTimer = window.setTimeout(() => {
+      key.classList.remove("is-active");
+    }, 110);
+  }
+
+  function playNote(note, keyElement) {
+    const audio = audioByNote.get(note);
+    if (!audio) {
+      return;
+    }
+
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        /* ignore autoplay interruption */
+      });
+    }
+
+    if (keyElement) {
+      flashKey(keyElement);
+      const rect = keyElement.getBoundingClientRect();
+      spawnSparks(rect.left + rect.width / 2, Math.min(rect.bottom, height - 6));
+    }
+  }
+
+  function setProjectsState(isOpen) {
+    projectsOpen = isOpen;
+    projectsToggle.textContent = isOpen ? "Hide Projects" : "Show Projects";
+    projectsToggle.setAttribute("aria-expanded", String(isOpen));
+
+    if (isOpen) {
+      projectsList.hidden = false;
+      projectsList.classList.add("is-open");
+      document.body.classList.add("projects-open");
+      return;
+    }
+
+    projectsList.classList.remove("is-open");
+    document.body.classList.remove("projects-open");
+
+    window.setTimeout(() => {
+      if (!projectsOpen) {
+        projectsList.hidden = true;
+      }
+    }, 300);
+  }
+
+  projectsToggle.addEventListener("click", () => {
+    setProjectsState(!projectsOpen);
+  });
+
+  keyboardEl.addEventListener("pointerdown", (event) => {
+    const key = event.target.closest(".key");
+    if (!key) {
+      return;
+    }
+
+    event.preventDefault();
+    playNote(key.dataset.note, key);
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.repeat) {
+      return;
+    }
+
+    const tag = document.activeElement ? document.activeElement.tagName : "";
+    if (tag === "INPUT" || tag === "TEXTAREA") {
+      return;
+    }
+
+    const note = keyboardLayout[event.key.toLowerCase()];
+    if (!note) {
+      return;
+    }
+
+    const key = keyByNote.get(note);
+    playNote(note, key);
+  });
+
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      const xRatio = event.clientX / Math.max(1, width) - 0.5;
+      const yRatio = event.clientY / Math.max(1, height) - 0.5;
+      targetX = xRatio * 2;
+      targetY = yRatio * 2;
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("pointerleave", () => {
+    targetX = 0;
+    targetY = 0;
+  });
+
+  let resizePending = false;
+  window.addEventListener("resize", () => {
+    if (resizePending) {
+      return;
+    }
+
+    resizePending = true;
+    window.requestAnimationFrame(() => {
+      resizePending = false;
+      setupStars();
     });
-   }
-
-}
-
-function placeStar( star ) {
-
-  star.x = Math.random() * width;
-  star.y = Math.random() * height;
-
-}
-
-function recycleStar( star ) {
-
-  let direction = 'z';
-
-  let vx = Math.abs( velocity.x ),
-	    vy = Math.abs( velocity.y );
-
-  if( vx > 1 || vy > 1 ) {
-    let axis;
-
-    if( vx > vy ) {
-      axis = Math.random() < vx / ( vx + vy ) ? 'h' : 'v';
-    }
-    else {
-      axis = Math.random() < vy / ( vx + vy ) ? 'v' : 'h';
-    }
-
-    if( axis === 'h' ) {
-      direction = velocity.x > 0 ? 'l' : 'r';
-    }
-    else {
-      direction = velocity.y > 0 ? 't' : 'b';
-    }
-  }
-  
-  star.z = STAR_MIN_SCALE + Math.random() * ( 1 - STAR_MIN_SCALE );
-
-  if( direction === 'z' ) {
-    star.z = 0.1;
-    star.x = Math.random() * width;
-    star.y = Math.random() * height;
-  }
-  else if( direction === 'l' ) {
-    star.x = -OVERFLOW_THRESHOLD;
-    star.y = height * Math.random();
-  }
-  else if( direction === 'r' ) {
-    star.x = width + OVERFLOW_THRESHOLD;
-    star.y = height * Math.random();
-  }
-  else if( direction === 't' ) {
-    star.x = width * Math.random();
-    star.y = -OVERFLOW_THRESHOLD;
-  }
-  else if( direction === 'b' ) {
-    star.x = width * Math.random();
-    star.y = height + OVERFLOW_THRESHOLD;
-  }
-
-}
-
-function resize() {
-
-  scale = window.devicePixelRatio || 1;
-
-  width = window.innerWidth * scale;
-  height = window.innerHeight * scale;
-
-  canvas.width = width;
-  canvas.height = height;
-
-  stars.forEach( placeStar );
-
-}
-
-function step() {
-
-  context.clearRect( 0, 0, width, height );
-
-  update();
-  render();
-
-  requestAnimationFrame( step );
-
-}
-
-function update() {
-
-  velocity.tx *= 0.96;
-  velocity.ty *= 0.96;
-
-  velocity.x += ( velocity.tx - velocity.x ) * 0.8;
-  velocity.y += ( velocity.ty - velocity.y ) * 0.8;
-
-  stars.forEach( ( star ) => {
-
-    star.x += velocity.x * star.z;
-    star.y += velocity.y * star.z;
-
-    star.x += ( star.x - width/2 ) * velocity.z * star.z;
-    star.y += ( star.y - height/2 ) * velocity.z * star.z;
-    star.z += velocity.z;
-  
-    // recycle when out of bounds
-    if( star.x < -OVERFLOW_THRESHOLD || star.x > width + OVERFLOW_THRESHOLD || star.y < -OVERFLOW_THRESHOLD || star.y > height + OVERFLOW_THRESHOLD ) {
-      recycleStar( star );
-    }
-
-  } );
-
-}
-
-function render() {
-
-  stars.forEach( ( star ) => {
-
-    context.beginPath();
-    context.lineCap = 'round';
-    context.lineWidth = STAR_SIZE * star.z * scale;
-    context.strokeStyle = 'rgba(255,255,255,'+(0.5 + 0.5*Math.random())+')';
-
-    context.beginPath();
-    context.moveTo( star.x, star.y );
-
-    var tailX = velocity.x * 2,
-        tailY = velocity.y * 2;
-
-    // stroke() wont work on an invisible line
-    if( Math.abs( tailX ) < 0.1 ) tailX = 0.5;
-    if( Math.abs( tailY ) < 0.1 ) tailY = 0.5;
-
-    context.lineTo( star.x + tailX, star.y + tailY );
-
-    context.stroke();
-
-  } );
-
-}
-
-function movePointer( x, y ) {
-
-  if( typeof pointerX === 'number' && typeof pointerY === 'number' ) {
-
-    let ox = x - pointerX,
-        oy = y - pointerY;
-
-    velocity.tx = velocity.tx + ( ox / 7*scale ) * ( touchInput ? 1 : -1 );
-    velocity.ty = velocity.ty + ( oy / 7*scale ) * ( touchInput ? 1 : -1 );
-
-  }
-
-  pointerX = x;
-  pointerY = y;
-
-}
-
-function onMouseMove( event ) {
-
-  touchInput = false;
-
-  movePointer( event.clientX, event.clientY );
-
-}
-
-function onTouchMove( event ) {
-
-  touchInput = true;
-
-  movePointer( event.touches[0].clientX, event.touches[0].clientY, true );
-
-  event.preventDefault();
-
-}
-
-function onMouseLeave() {
-
-  pointerX = null;
-  pointerY = null;
-
-}
-
-///////////////// Text Typing ///////////////
-
-var i = 0;
-var txt = 'Software Developer, Musician, Sociologist';
-var speed = 50;
-
-function typeWriter() {
-  if (i < txt.length) {
-    document.getElementById("description").innerHTML += txt.charAt(i);
-    i++;
-    setTimeout(typeWriter, speed);
-  }
-}
-typeWriter()
-
-
-///////////////// Button Click //////////////
-var particles = [];
-var alreadyRendering = false;
-
-// originally from Rachel Smith on CodePen https://codepen.io/rachsmith/pen/oXBOwg
-/* global particles */
-
-function sparkShower(startx, starty, sparkWidth, sparkHeight) {
-  var canvas = document.getElementById('canvas2');
-  var ctx = canvas.getContext('2d');
-  var width = canvas.width = sparkWidth;
-  var height = canvas.height = sparkHeight;
-//   var colors = ['#AF4A0D', '##FFD064', '#FEFFFD'];
-  var colors = ['#ff96d0', '#ffffff', '#ebdde9'];
-  // this is only used for simple gravity
-  var gravity = 1;
-  //var particles = [];
-  var floor = sparkHeight;
-  var currentlySparking = false;
-//   var maxSize = 10; //original
-  var maxSize = 3;
-  // This is the acceleration of Gravity in m/s.
-  var ag = 4.1;
-
-  function initParticles() {
-    currentlySparking = true;
-    for (var i = 0; i < 50; i++) {
-      setTimeout(function() {
-        createParticle(i);
-        createParticle(i * 2);
-      }, i);
-    }
-  }
-
-  function createParticle(i) {
-    // initial position in middle of canvas
-    var x = startx;
-    var y = starty;
-    // var z = (Math.random() * 2);
-    var z = (Math.random() * 2);
-    // randomize the vx and vy a little - but we still want them flying 'up' and 'out'
-    // var maxex = Math.random() * 10;
-    // Starting speed?
-    var maxex = Math.random() * 5;
-    var vx = (Math.random() * maxex) - (maxex / 2);
-    var vy = (Math.random() * -20);
-    // velocity size?
-    var vsize = 0;
-    // randomize size and opacity a little & pick a color from our color palette
-    // var size = 1 + Math.random();
-    var size = 0.1
-    var color = colors[Math.floor(Math.random() * colors.length)];
-    // var opacity = 0.5 + Math.random() * 0.5;
-    var opacity = 0.3 + Math.random() * 0.3;
-    var d = new Date();
-    var startTime = d.getTime();
-    var p = new Particle(x, y, z, vx, vy, size, vsize, color, opacity, startTime, startTime);
-    p.finished = false;
-    particles.push(p);
-  }
-
-  function Particle(x, y, z, vx, vy, size, vsize, color, opacity, startTime, lastTime) {
-
-    function reset() {
-      opacity = 0;
-      this.finished = true;
-    }
-
-    this.update = function() {
-      // if a particle has faded to nothing we can reset it to the starting position
-      // SURVIVABILITY
-      if (opacity - 0.0005 > 0) opacity -= 0.0008;
-      else reset();
-      // simple gravity
-      //vy += gravity;
-      var d = new Date();
-      var timeNow = d.getTime();
-      // Calculate gravity based on time elapsed since last update in lastTime
-      // Pixels per "Meter" = 4735 = 4.7
-      // Velocity of Y = Acceleration of Gravity in meters per second * number of seconds since last calc * pixels-per-meter
-      if (timeNow > lastTime)
-        // vy += (ag * ((timeNow - lastTime) / 1000) * 4.7);
-		vy += (ag * ((timeNow - lastTime) / 1000) * 0.7);
-      lastTime = timeNow;
-      x += vx;
-      y += vy;
-      if (y > (floor + 10)) this.finished = true;
-      if (size < maxSize) size += vsize * z;
-      if ((opacity < 0.5) && (y < floor)) {
-        vsize = 0.55 - opacity;
-      } else {
-        vsize = 0;
-      }
-      // add bouncing off the floor
-      if (y > floor) {
-        vy = vy * -0.4;
-        vx = vx * 0.96;
-      }
-    };
-
-    this.draw = function() {
-      ctx.globalAlpha = opacity;
-      ctx.fillStyle = color;
-      //ctx.fillRect(x, y, size, size);
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, 2 * Math.PI);
-      ctx.fill();
-    };
-  }
-
-  function render() {
-    alreadyRendering = true;
-    ctx.clearRect(0, 0, width, height);
-    for (var i = 0; i < particles.length; i++) {
-      if (typeof particles[i] !== "undefined") {
-        if (particles[i].finished === true) {
-          particles.splice(i, 1);
-        } else {
-          particles[i].update();
-          particles[i].draw();
-        }
-      }
-    }
-    requestAnimationFrame(render);
-  }
-
-  // resize
-  window.addEventListener('resize', resize);
-
-  function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-  }
-
-  // init
-  initParticles();
-  if (!alreadyRendering)
-    render();
-}
-
-function keyPress(thisKey) {
-
-  thisKeyRect = thisKey.getBoundingClientRect();
-  var initialX = thisKeyRect.left + ((thisKeyRect.right - thisKeyRect.left) / 2);
-//   var initialY = thisKeyRect.bottom + (thisKeyRect.top - thisKeyRect.bottom / 2);
-  var initialY = thisKeyRect.bottom
-  console.log(initialX, initialY)
-  var sparkCanvas = $('#canvas2');
-  var sparkWidth = sparkCanvas.width();
-  var sparkHeight = sparkCanvas.height();
-  console.log(sparkWidth, sparkHeight)
-  //var sparkHeight = $('.video-stream').position().top;
-  sparkShower(initialX, initialY, sparkWidth, sparkHeight);
-}
-
-// This is what assigns the buttons
-document.addEventListener('click', function(e) {
-    e = e || window.event;
-    var target = e.target;
-	keyPress(target);
-})
-
-
-
-///// Pulses /////
-function createRipple(event) {
-  const key = event.currentTarget;
-  const theRipple = document.createElement("span");
-  const diameter = Math.max(key.clientWidth, key.clientHeight);
-  const radius = diameter / 2;
-  theRipple.style.width = theRipple.style.height = `${diameter}px`;
-  theRipple.style.left = `${event.clientX - (key.offsetLeft + radius)}px`;
-  theRipple.style.top = `${event.clientY - (key.offsetTop + radius)}px`;
-  /*
-  const key_width = key.clientWidth;
-  const key_height = key.clientHeight;
-  theRipple.style.width = `${key_width}px`;
-  theRipple.style.width = `${key_height}px`;
-  theRipple.style.left = `${event.clientX - (key.offsetLeft )}px`;
-  theRipple.style.top = `${event.clientY - (key.offsetTop )}px`;
-  */
-  theRipple.classList.add("ripple"); 
-  console.log('added ripple!')
-
-  // Check for existing and remove
-  const ripple = key.getElementsByClassName("ripple")[0];
-  if (ripple) {
-    console.log('Removing already existent ripple')
-    ripple.remove();
-  }
-
-  // Inject the span into key
-  key.appendChild(theRipple);
-}
-
-// This is what assigns the ripples
-const allKeys = document.getElementsByClassName('key')
-for (const key of allKeys) {
-  key.addEventListener("click", createRipple);
-}
-
-
-///// Music /////
-let csound = document.getElementById('csound')
-let csharpsound = document.getElementById('csharpsound')
-let dsound = document.getElementById('dsound')
-let dsharpsound = document.getElementById('dsharpsound')
-let esound = document.getElementById('esound')
-let fsound = document.getElementById('fsound')
-let fsharpsound = document.getElementById('fsharpsound')
-let gsound = document.getElementById('gsound')
-let gsharpsound = document.getElementById('gsharpsound')
-let asound = document.getElementById('asound')
-let asharpsound = document.getElementById('asharpsound')
-let bsound = document.getElementById('bsound')
-let c2sound = document.getElementById('c2sound')
-let c2sharpsound = document.getElementById('c2sharpsound')
-
-let c = document.getElementById('c')
-let csharp = document.getElementById('csharp')
-let d = document.getElementById('d')
-let dsharp = document.getElementById('dsharp')
-let e = document.getElementById('e')
-let f = document.getElementById('f')
-let fsharp = document.getElementById('fsharp')
-let g = document.getElementById('g')
-let gsharp = document.getElementById('gsharp')
-let a = document.getElementById('a')
-let asharp = document.getElementById('asharp')
-let b = document.getElementById('b')
-let c2 = document.getElementById('c2')
-let c2sharp = document.getElementById('c2sharp')
-
-c.onclick =
-  function() {
-    console.log('C');
-    csound.play();
-    return false;
-    };
-
-csharp.onclick =
-  function() {
-    console.log('C#');
-    csharpsound.play();
-    return false;
-    };
-d.onclick =
-  function() {
-    console.log('D');
-    dsound.play();
-    return false;
-    };    
-dsharp.onclick =
-  function() {
-    console.log('D#');
-    dsharpsound.play();
-    return false;
-    };
-e.onclick =
-  function() {
-    console.log('E');
-    esound.play();
-    return false;
-    };
-f.onclick =
-  function() {
-    console.log('F');
-    fsound.play();
-    return false;
-    };
-fsharp.onclick =
-  function() {
-    console.log('F#');
-    fsharpsound.play();
-    return false;
-    };
-g.onclick =
-  function() {
-    console.log('G');
-    gsound.play();
-    return false;
-    };
-gsharp.onclick =
-  function() {
-    console.log('G#');
-    gsharpsound.play();
-    return false;
-    };
-a.onclick =
-  function() {
-    console.log('A');
-    asound.play();
-    return false;
-    };
-asharp.onclick =
-  function() {
-    console.log('A#');
-    asharpsound.play();
-    return false;
-    };
-b.onclick =
-  function() {
-    console.log('B');
-    bsound.play();
-    return false;
-    };
-c2.onclick =
-  function() {
-    console.log('C2');
-    c2sound.play();
-    return false;
-    };
-c2sharp.onclick =
-  function() {
-    console.log('C2');
-    c2sharpsound.play();
-    return false;
-    };
-
-///// projects page down /////
-
-var keys_visible = true
-
-function toggleProjects() {
-  var btn = document.getElementById("projects-btn");
-  var arrowIcon = document.getElementById("arrow-icon");
-  var allProjects = document.getElementById("allProjects")
-  var toolTipText = document.getElementById("tooltiptext")
-  const allKeys = document.getElementsByClassName('key');
-
-  if (keys_visible == true) {
-    toolTipText.innerHTML = 'Click me to play piano!' //dodgy logic
-    arrowIcon.classList.remove('fa-chevron-circle-down');
-    arrowIcon.classList.add('fa-chevron-circle-up');
-    
-
-    keys_visible = false
-
-    for (const key of allKeys) {      
-      key.classList.remove("keys_in");
-      key.classList.remove("keys_out");
-      void key.offsetTop;
-      key.classList.add("keys_out");
-    }
-    allProjects.classList.remove("projects_out");
-    allProjects.classList.remove("projects_in");
-    void allProjects.offsetTop;
-    allProjects.classList.add("projects_in");
-
-
-
-  } else { 
-    toolTipText.innerHTML = 'Click me for more projects!' //dodgy logic
-    arrowIcon.classList.remove('fa-chevron-circle-up');
-    arrowIcon.classList.add('fa-chevron-circle-down');
-
-    keys_visible = true;
-
-    for (const key of allKeys) {
-      key.classList.remove("keys_out");
-      key.classList.remove("keys_in");
-      void key.offsetTop;
-      key.classList.add("keys_in"); 
-    }
-
-    allProjects.classList.remove("projects_in");
-    allProjects.classList.remove("projects_out");
-    void allProjects.offsetTop;
-    allProjects.classList.add("projects_out");
-
-
-  }
-  btn.className
-
-
-}
+  });
+
+  setupStars();
+  starAnimationId = window.requestAnimationFrame(animateStars);
+})();
