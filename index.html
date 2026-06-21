@@ -1,67 +1,295 @@
-<html>
-  <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="style.css"> 
-    <meta name='viewport' content='user-scalable=0' >
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <meta property="og:title" content="Bryan Leong Homepage">
-    <meta property="og:description" content="Assorted projects and a fun little music app">
-    <meta property="og:image" content="https://github.com/LeongBryan/home/blob/master/cover_photo.jpg">
-    <meta property="og:url" content="https://leongbryan.github.io/home/">
-    
-    <meta prefix="og: http://ogp.me/ns#" property="og:title" content="Bryan Leong Homepagep" />
-    <meta prefix="og: http://ogp.me/ns#" property="og:type" content="website" />
-    <meta prefix="og: http://ogp.me/ns#" property="og:image" content="https://github.com/LeongBryan/home/blob/master/cover_photo.jpg" />
-    <meta prefix="og: http://ogp.me/ns#" property="og:url" content="https://leongbryan.github.io/home/" />
-  </head>
-     
-    <canvas id="canvas1"></canvas>
-    <canvas id="canvas2"></canvas>
-    <audio id="csound" src="notes/C.mp3"></audio>
-    <audio id="csharpsound" src="notes/Csharp.mp3"></audio>
-    <audio id="dsound" src="notes/D.mp3"></audio>
-    <audio id="dsharpsound" src="notes/Dsharp.mp3"></audio>
-    <audio id="esound" src="notes/E.mp3"></audio>
-    <audio id="fsound" src="notes/F.mp3"></audio>
-    <audio id="fsharpsound" src="notes/Fsharp.mp3"></audio>
-    <audio id="gsound" src="notes/G.mp3"></audio>
-    <audio id="gsharpsound" src="notes/Gsharp.mp3"></audio>
-    <audio id="asound" src="notes/A.mp3"></audio>
-    <audio id="asharpsound" src="notes/Asharp.mp3"></audio>
-    <audio id="bsound" src="notes/B.mp3"></audio>
-    <audio id="c2sound" src="notes/C2.mp3"></audio>
-    <audio id="c2sharpsound" src="notes/C2sharp.mp3"></audio>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bryan Leong</title>
+  <meta name="description" content="DevOps Engineer · Jazz Pianist · Sociologist. Code that swings.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <body>
-      
-      <div id="name">Bryan Leong
-        <div id="description"></div>
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursorTrail"></div>
+
+  <!-- 3D Rotating Background Cylinder -->
+  <div class="bg-scene" id="bgScene">
+    <div class="bg-cylinder" id="bgCylinder">
+
+      <!-- Panel 0: Hero — deep space -->
+      <div class="bg-panel panel-0">
+        <canvas id="heroCanvas" class="panel-canvas"></canvas>
+        <div class="panel-vignette"></div>
       </div>
 
-      
-      <div id='c' class='key white' style='left:0%'></div>
-      <div id='d' class='key white' style='left:12.5%'></div>
-      <div id='e' class='key white' style='left:25%'></div>
-      <div id='f' class='key white' style='left:37.5%'></div>
-      <div id='g' class='key white' style='left:50%'></div>
-      <div id='a' class='key white' style='left:62.5%'></div>
-      <div id='b' class='key white' style='left:75%'></div>
-      <div id='c2' class='key white'style='left:87.5%'></div>
+      <!-- Panel 1: Music — giant vinyl -->
+      <div class="bg-panel panel-1">
+        <div class="vinyl-bg">
+          <div class="vinyl-tilt">
+            <div class="vinyl-bg-disc" id="vinylBgDisc">
 
-      <div id='csharp' class='key black' style='left:8%'></div>
-      <div id='dsharp' class='key black' style='left:20.5%'></div>
-      <div id='fsharp' class='key black' style='left:45.5%'></div>
-      <div id='gsharp' class='key black' style='left:58%'></div>
-      <div id='asharp' class='key black' style='left:70.5%'></div>
-      <div id='c2sharp' class='key black' style='left:95.5%;'></div>
-      
+              <!-- Text around the rim -->
+              <svg class="vinyl-rim-svg" viewBox="0 0 100 100" aria-hidden="true">
+                <defs>
+                  <path id="rimPath" d="M 50,8 A 42,42 0 1,1 49.999,8"/>
+                </defs>
+                <text class="rim-text">
+                  <textPath href="#rimPath">BLEONG MUSIC · BLEONG MUSIC · BLEONG MUSIC · BLEONG MUSIC · BLEONG MUSIC · BLEONG MUSIC · BLEONG MUSIC · BLEONG MUSIC · </textPath>
+                </text>
+              </svg>
 
+              <!-- Centre: hole + spindle only -->
+              <div class="vinyl-bg-label">
+                <div class="vbl-hole">
+                  <div class="vbl-spindle"></div>
+                </div>
+              </div>
 
-    </body>
-  
-    
-    <script src="script.js"></script>
-    
+            </div>
+          </div>
+        </div>
+        <div class="music-aurora"></div>
+        <div class="panel-vignette"></div>
+        <canvas id="crackleCanvas" class="panel-canvas crackle-canvas"></canvas>
+        <div class="film-grain"></div>
+      </div>
+
+      <!-- Panel 2: Code — matrix green -->
+      <div class="bg-panel panel-2">
+        <canvas id="codeCanvas" class="panel-canvas"></canvas>
+        <div class="circuit-grid"></div>
+        <div class="panel-vignette"></div>
+      </div>
+
+      <!-- Panel 3: Projects — cork board -->
+      <div class="bg-panel panel-3">
+        <canvas id="corkCanvas" class="panel-canvas"></canvas>
+        <div class="panel-vignette"></div>
+        <canvas id="dustCanvas" class="panel-canvas"></canvas>
+        <div class="board-frame-border"></div>
+        <div class="light-string" aria-hidden="true"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Color tint overlay (shifts on scroll) -->
+  <div class="tint-overlay" id="tintOverlay"></div>
+
+  <!-- Scroll progress bar -->
+  <div class="scroll-bar" id="scrollBar"></div>
+
+  <!-- Section nav dots -->
+  <nav class="dot-nav" id="dotNav" aria-label="Sections">
+    <button class="dot active" data-idx="0" aria-label="Home"></button>
+    <button class="dot" data-idx="1" aria-label="Music"></button>
+    <button class="dot" data-idx="2" aria-label="Code"></button>
+    <button class="dot" data-idx="3" aria-label="Projects"></button>
+  </nav>
+
+  <!-- Section label that floats top-left -->
+  <div class="section-badge" id="sectionBadge">
+    <span class="badge-num" id="badgeNum">00</span>
+    <span class="badge-sep">/</span>
+    <span class="badge-name" id="badgeName">Home</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCROLLABLE CONTENT
+  ═══════════════════════════════════════════ -->
+  <main class="scroll-content">
+
+    <!-- ── SECTION 0: HERO ── -->
+    <section class="section s-hero" id="s0" data-name="Home">
+      <div class="hero-wrap">
+
+        <div class="glitch-box">
+          <h1 class="hero-name" data-text="BRYAN LEONG">BRYAN LEONG</h1>
+        </div>
+
+        <div class="hero-roles-wrap">
+          <span class="hero-role" id="roleCycler">DevOps Engineer</span>
+        </div>
+
+        <p class="hero-tagline">
+          In search of the right questions.
+        </p>
+
+        <div class="hero-wave" id="heroWave"></div>
+
+        <div class="hero-actions">
+          <a href="#s1" class="pill pill-lit" data-section="1">♪ Hear me play</a>
+          <a href="#s2" class="pill pill-ghost" data-section="2">{ } See my code</a>
+        </div>
+
+        <div class="scroll-hint" id="scrollHint">
+          <span class="scroll-hint-line"></span>
+          <span class="scroll-hint-text">scroll</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION 1: MUSIC ── -->
+    <section class="section s-music" id="s1" data-name="Music">
+      <div class="music-inner">
+        <p class="section-eyebrow">01 — MUSIC</p>
+        <h2 class="section-heading">
+          Jazz, Hymns<br>&amp; <em class="accent-warm">Everything</em><br>Between.
+        </h2>
+        <p class="section-body">
+          Eternally indebted to parents who forced me through ABRSM syllabus.
+          The rest of the journey has been beholding the wonder of Tommy Emmanuel
+          and Jacob Collier, jamming with friends, experimenting with Irish Trad,
+          and listening to Yorushika on repeat.
+        </p>
+
+        <div class="music-links">
+          <a class="mlink" href="https://soundcloud.com/bleongmusic" target="_blank" rel="noreferrer">
+            <span class="mlink-icon">◎</span>
+            <div>
+              <strong>SoundCloud</strong>
+              <span>Originals &amp; covers · bleongmusic</span>
+            </div>
+            <span class="mlink-arrow">↗</span>
+          </a>
+          <a class="mlink" href="https://hymnops.xyz" target="_blank" rel="noreferrer">
+            <span class="mlink-icon">♪</span>
+            <div>
+              <strong>HymnOps</strong>
+              <span>Hymnal operations platform · hymnops.xyz</span>
+            </div>
+            <span class="mlink-arrow">↗</span>
+          </a>
+          <a class="mlink" href="https://www.facebook.com/bleongmusic/" target="_blank" rel="noreferrer">
+            <span class="mlink-icon">♫</span>
+            <div>
+              <strong>BleongMusic</strong>
+              <span>Music page · Facebook</span>
+            </div>
+            <span class="mlink-arrow">↗</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: CODE ── -->
+    <section class="section s-code" id="s2" data-name="Code">
+      <div class="inner">
+        <p class="section-eyebrow">02 — CODE</p>
+        <h2 class="section-heading">
+          Systems <em class="accent-green">&amp;</em><br>Side Projects
+        </h2>
+
+        <div class="terminal" id="terminal">
+          <div class="terminal-bar">
+            <span class="tb-dot tb-red"></span>
+            <span class="tb-dot tb-yellow"></span>
+            <span class="tb-dot tb-green"></span>
+            <span class="tb-label">bryan@local — bash</span>
+          </div>
+          <div class="terminal-body" id="termBody">
+            <div class="tline active">
+              <span class="tprompt">$</span>
+              <span id="typeTarget"></span><span class="tcursor">█</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="section-body" style="margin-top: 2rem;">
+          DevOps engineer by day. I dabble in open source projects, game dev,
+          and collect <a href="https://openprofile.dev/profile/bryanleong" target="_blank" rel="noreferrer" class="inline-link">CNCF badges</a>.
+        </p>
+        <p class="section-body" style="margin-top: 0.6rem;">
+          Self-taught. Still learning. Always building.
+        </p>
+
+        <a class="pill pill-green" href="https://github.com/LeongBryan/" target="_blank" rel="noreferrer">
+          View GitHub ↗
+        </a>
+      </div>
+    </section>
+
+    <!-- ── SECTION 3: PROJECTS — pinboard ── -->
+    <section class="section s-projects" id="s3" data-name="Projects">
+      <div class="board-wrap">
+
+        <span class="board-tape">✦ &nbsp; Projects &nbsp; ✦</span>
+
+        <div class="card-scatter">
+
+          <div class="sway-wrap" style="--sd:4.8s;--sa:1.6deg;--sx:-0.8s;--ed:0.04s">
+            <a class="pin-card" style="--rot:-2.2deg" href="https://hymnops.xyz" target="_blank" rel="noreferrer">
+              <span class="pushpin pushpin--coral"></span>
+              <h3 class="card-title">HymnOps</h3>
+              <p class="card-stack">React · DevOps</p>
+              <p class="card-note">What happens when DevOps meets Sunday service. Two worlds that had no business colliding.</p>
+              <span class="card-year">'24</span>
+            </a>
+          </div>
+
+          <div class="sway-wrap" style="--sd:5.7s;--sa:2.0deg;--sx:-2.4s;--ed:0.10s">
+            <a class="pin-card" style="--rot:1.5deg" href="https://leongbryan.github.io/Mossie-Wipeout/" target="_blank" rel="noreferrer">
+              <span class="pushpin pushpin--teal"></span>
+              <h3 class="card-title">Mossie Wipeout</h3>
+              <p class="card-stack">JavaScript · Canvas</p>
+              <p class="card-note">Built at 2am because Singapore mosquitoes are genuinely a menace.</p>
+              <span class="card-year">'22</span>
+            </a>
+          </div>
+
+          <div class="sway-wrap" style="--sd:4.2s;--sa:1.3deg;--sx:-1.1s;--ed:0.17s">
+            <a class="pin-card" style="--rot:-1.1deg" href="https://github.com/LeongBryan/bible-quizarium" target="_blank" rel="noreferrer">
+              <span class="pushpin pushpin--green"></span>
+              <h3 class="card-title">Bible Quizarium</h3>
+              <p class="card-stack">TypeScript</p>
+              <p class="card-note">Trivia makes everything more engaging. Turns out this applies to scripture too.</p>
+              <span class="card-year">'23</span>
+            </a>
+          </div>
+
+          <div class="sway-wrap" style="--sd:6.1s;--sa:1.8deg;--sx:-3.7s;--ed:0.08s">
+            <a class="pin-card" style="--rot:2.3deg" href="https://www.kongregate.com/games/bleongmusic/inky" target="_blank" rel="noreferrer">
+              <span class="pushpin pushpin--amber"></span>
+              <h3 class="card-title">Inky</h3>
+              <p class="card-stack">Flash · Game Dev</p>
+              <p class="card-note">Flash game from the self-learning era. I'm still quietly proud of this one.</p>
+              <span class="card-year">'12</span>
+            </a>
+          </div>
+
+          <div class="sway-wrap" style="--sd:5.1s;--sa:1.5deg;--sx:-0.5s;--ed:0.14s">
+            <a class="pin-card" style="--rot:-1.7deg" href="https://github.com/LeongBryan/Kubernomics" target="_blank" rel="noreferrer">
+              <span class="pushpin pushpin--pink"></span>
+              <h3 class="card-title">Kubernomics</h3>
+              <p class="card-stack">Kubernetes · Go</p>
+              <p class="card-note">Visualising and simulating cluster usage (and wastage).</p>
+              <span class="card-year">'25</span>
+            </a>
+          </div>
+
+          <div class="sway-wrap" style="--sd:4.5s;--sa:2.3deg;--sx:-2.9s;--ed:0.21s">
+            <a class="pin-card" style="--rot:0.9deg" href="https://github.com/LeongBryan/" target="_blank" rel="noreferrer">
+              <span class="pushpin pushpin--silver"></span>
+              <h3 class="card-title">More →</h3>
+              <p class="card-stack">github.com/LeongBryan</p>
+              <p class="card-note">Where everything else lives and some things go to die.</p>
+              <span class="card-year">⌘</span>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
 </html>
